@@ -1,0 +1,38 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+.navbar-brand {
+    font-size: 1.1rem;
+}
+
+@media (min-width: 992px) {
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+}
+
+.footer-text {
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .footer-text {
+        text-align: right;
+    }
+}
+
+/* Smooth AOS animations */
+[data-aos] {
+    pointer-events: auto !important;
+}
+
+[data-aos].aos-animate {
+    pointer-events: auto !important;
+}
