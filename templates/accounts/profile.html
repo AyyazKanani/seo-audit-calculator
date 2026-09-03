@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profile | SEO Audit Calculator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="auth-card" data-aos="fade-up">
+            <div class="text-center mb-4">
+                <img src="{{ user.profile.image.url }}" alt="Profile" class="profile-img mb-3">
+                <h3 class="fw-bold">{{ user.get_full_name|default:user.username }}</h3>
+                <p class="text-muted">@{{ user.username }}</p>
+            </div>
+
+            <div class="profile-details">
+                <div class="profile-row">
+                    <span class="profile-label">Email</span>
+                    <span class="profile-value">{{ user.email }}</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Date Joined</span>
+                    <span class="profile-value">{{ user.date_joined|date:"M d, Y" }}</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Last Login</span>
+                    <span class="profile-value">{{ user.last_login|date:"M d, Y H:i" }}</span>
+                </div>
+                {% if user.profile.bio %}
+                <div class="profile-row">
+                    <span class="profile-label">Bio</span>
+                    <span class="profile-value">{{ user.profile.bio }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary btn-auth">Edit Profile</a>
+                <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-secondary btn-auth">Change Password</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

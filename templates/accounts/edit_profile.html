@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile | SEO Audit Calculator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="auth-card" data-aos="fade-up">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">Edit Profile</h2>
+                <p class="text-muted">Update your personal information</p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+
+                <h6 class="text-uppercase text-muted mb-3 small fw-bold">Personal Info</h6>
+
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    {{ user_form.username }}
+                    {% if user_form.username.errors %}
+                    <div class="invalid-feedback d-block">{{ user_form.username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-6">
+                        <label for="id_first_name" class="form-label">First Name</label>
+                        {{ user_form.first_name }}
+                        {% if user_form.first_name.errors %}
+                        <div class="invalid-feedback d-block">{{ user_form.first_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="id_last_name" class="form-label">Last Name</label>
+                        {{ user_form.last_name }}
+                        {% if user_form.last_name.errors %}
+                        <div class="invalid-feedback d-block">{{ user_form.last_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_email" class="form-label">Email</label>
+                    {{ user_form.email }}
+                    {% if user_form.email.errors %}
+                    <div class="invalid-feedback d-block">{{ user_form.email.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <h6 class="text-uppercase text-muted mb-3 small fw-bold">Profile</h6>
+
+                <div class="mb-3">
+                    <label for="id_image" class="form-label">Profile Picture</label>
+                    {{ profile_form.image }}
+                    {% if profile_form.image.errors %}
+                    <div class="invalid-feedback d-block">{{ profile_form.image.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="id_bio" class="form-label">Bio</label>
+                    {{ profile_form.bio }}
+                    {% if profile_form.bio.errors %}
+                    <div class="invalid-feedback d-block">{{ profile_form.bio.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-auth">Save Changes</button>
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-auth">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
