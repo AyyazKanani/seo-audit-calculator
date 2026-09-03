@@ -48,3 +48,18 @@ SCORE_DENSITY_IDEAL = 100
 SCORE_DENSITY_OK = 70
 SCORE_DENSITY_WARN = 40
 SCORE_DENSITY_LOW = 20
+
+# ---- Report grades (single source for model + filters) ----
+GRADE_RANGES = {
+    "A": (80, 100),  # Excellent
+    "B": (60, 79),   # Good
+    "C": (40, 59),   # Needs Improvement
+    "D": (0, 39),    # Poor
+}
+GRADE_LABEL_TO_CODE = {
+    "EXCELLENT": "A",
+    "GOOD": "B",
+    "NEEDS": "C",
+    "NEEDS_IMPROVEMENT": "C",
+    "POOR": "D",
+}

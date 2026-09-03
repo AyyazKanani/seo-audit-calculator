@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
+from .constants import GRADE_RANGES
+
 
 class SEOReport(models.Model):
     """
@@ -30,7 +32,7 @@ class SEOReport(models.Model):
         max_length=500,
         help_text="Page URL or slug (e.g. /blog/seo-tips)",
     )
-    title = models.CharField(max_length=200, help_text="Page title tag")
+    title = models.CharField(max_length=200, help_text="Page title tag", db_index=True)
     meta_description = models.CharField(
         max_length=500,
         help_text="Meta description tag",
@@ -74,12 +76,12 @@ class SEOReport(models.Model):
 
     @property
     def grade(self) -> str:
-        """Letter grade derived from overall_score."""
-        if self.overall_score >= 80:
+        """Letter grade derived from overall_score (uses GRADE_RANGES)."""
+        if self.overall_score >= GRADE_RANGES["A"][0]:
             return self.Grade.A
-        if self.overall_score >= 60:
+        if self.overall_score >= GRADE_RANGES["B"][0]:
             return self.Grade.B
-        if self.overall_score >= 40:
+        if self.overall_score >= GRADE_RANGES["C"][0]:
             return self.Grade.C
         return self.Grade.D
 
