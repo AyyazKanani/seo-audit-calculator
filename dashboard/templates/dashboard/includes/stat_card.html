@@ -1,0 +1,17 @@
+{# Reusable stat card — expects: icon, bg, badge_label, badge_grade, value, suffix, label, delay #}
+<div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="{{ delay|default:50 }}">
+    <div class="card dash-card h-100 border-0 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="metric-icon {{ bg }}" aria-hidden="true"><i class="bi {{ icon }}"></i></div>
+                {% if badge_grade %}
+                <span class="badge grade-badge grade-{{ badge_grade }} small">{{ badge_label }}</span>
+                {% else %}
+                <span class="badge bg-dark border text-muted small">{{ badge_label }}</span>
+                {% endif %}
+            </div>
+            <h3 class="fw-bold mb-1" style="color: var(--text);">{{ value }}<small class="fs-6 text-muted">{{ suffix }}</small></h3>
+            <p class="small text-muted mb-0">{{ label }}</p>
+        </div>
+    </div>
+</div>

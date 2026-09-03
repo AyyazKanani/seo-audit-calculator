@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard | SEO Audit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+
+            <!-- Welcome -->
+            <div class="d-flex flex-wrap gap-3 justify-content-between align-items-end mb-4" data-aos="fade-up">
+                <div>
+                    <h2 class="fw-bold mb-1" style="color: var(--text);">Welcome back, {{ user.first_name|default:user.username }} 👋</h2>
+                    <p class="text-muted small mb-0">Here's what's happening with your SEO audits.</p>
+                </div>
+                <span class="badge bg-dark border text-muted fw-medium d-none d-md-inline-flex">
+                    <i class="bi bi-calendar3 me-1" aria-hidden="true"></i> {{ user.date_joined|date:"M Y" }} member
+                </span>
+            </div>
+
+            {% if has_reports %}
+            <!-- Summary cards -->
+            <div class="row g-3 g-md-4 mb-4">
+                {% for card in stat_cards %}
+                    {% include "dashboard/includes/stat_card.html" with icon=card.icon bg=card.bg badge_label=card.badge_label badge_grade=card.badge_grade value=card.value suffix=card.suffix label=card.label delay=card.delay %}
+                {% endfor %}
+            </div>
+
+            <!-- Distribution + Recent -->
+            <div class="row g-3 g-md-4 mb-4">
+                <!-- Distribution -->
+                <div class="col-12 col-lg-5" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card dash-card h-100 border-0 shadow-sm" role="region" aria-labelledby="dist-heading">
+                        <div class="card-header bg-transparent d-flex align-items-center gap-2 py-3" style="border-color: var(--border);">
+                            <div class="reco-header-icon" aria-hidden="true"><i class="bi bi-pie-chart"></i></div>
+                            <h6 id="dist-heading" class="mb-0 fw-bold" style="color: var(--text);">Score Distribution</h6>
+                        </div>
+                        <div class="card-body">
+                            {% for item in distribution %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="small fw-semibold" style="color: var(--text);">
+                                        <span class="badge rounded-pill grade-badge grade-{{ item.grade|lower }} me-1" style="font-size: 0.6rem; padding: 0.2rem 0.4rem;">{{ item.grade }}</span>
+                                        {{ item.label }}
+                                    </span>
+                                    <span class="small text-muted">{{ item.count }} • {{ item.pct }}%</span>
+                                </div>
+                                <div class="progress" style="height: 8px; background: var(--bg);">
+                                    <div class="progress-bar {% if item.grade == 'A' %}bg-success{% elif item.grade == 'B' %}bg-lime{% elif item.grade == 'C' %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ item.pct }}%;" aria-valuenow="{{ item.pct }}" aria-valuemin="0" aria-valuemax="100" aria-label="{{ item.label }} {{ item.pct }} percent"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <p class="small text-muted mb-0 mt-3"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>{{ total_audits }} total audits</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent -->
+                <div class="col-12 col-lg-7" data-aos="fade-up" data-aos-delay="130">
+                    <div class="card dash-card h-100 border-0 shadow-sm" role="region" aria-labelledby="recent-heading">
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-3" style="border-color: var(--border);">
+                            <h6 id="recent-heading" class="mb-0 fw-bold" style="color: var(--text);"><i class="bi bi-clock-history me-2" aria-hidden="true"></i>Recent Audits</h6>
+                            <a href="{% url 'calculator:reports' %}" class="btn btn-sm btn-outline-dark">View all</a>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            {% for r in recent_reports %}
+                            <a href="{{ r.get_absolute_url }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="background: transparent; border-color: rgba(51,65,85,.45); color: var(--text);">
+                                <div class="me-3" style="min-width: 0;">
+                                    <div class="fw-semibold text-truncate" style="max-width: 280px;" title="{{ r.title }}">{{ r.title }}</div>
+                                    <div class="small text-muted text-truncate"><i class="bi bi-bullseye me-1" aria-hidden="true"></i>{{ r.target_keyword }} • {{ r.created_at|date:"M d" }}</div>
+                                </div>
+                                <span class="badge rounded-pill grade-badge grade-{{ r.grade|lower }} flex-shrink-0">{{ r.overall_score }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick actions -->
+            <div class="card dash-card border-0 shadow-sm" data-aos="fade-up" data-aos-delay="150" role="region" aria-labelledby="actions-heading">
+                <div class="card-body">
+                    <h6 id="actions-heading" class="fw-bold mb-3" style="color: var(--text);"><i class="bi bi-lightning me-1" aria-hidden="true"></i>Quick Actions</h6>
+                    <div class="row g-2">
+                        <div class="col-12 col-md-4">
+                            <a href="{% url 'calculator:calculator' %}" class="btn btn-primary w-100"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> New Audit</a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="{% url 'calculator:reports' %}" class="btn btn-outline-dark w-100"><i class="bi bi-collection me-1" aria-hidden="true"></i> View All Reports</a>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-dark w-100"><i class="bi bi-person me-1" aria-hidden="true"></i> Edit Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Empty state -->
+            <div class="card dash-card border-0 shadow-sm text-center py-5" data-aos="fade-up">
+                <div class="card-body">
+                    <div class="mx-auto mb-3 d-inline-flex align-items-center justify-content-center rounded-circle" style="width:64px;height:64px;background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.2); color: var(--primary-light); font-size: 1.6rem;" aria-hidden="true"><i class="bi bi-graph-up-arrow"></i></div>
+                    <h5 class="fw-bold" style="color: var(--text);">No audits yet</h5>
+                    <p class="text-muted small mx-auto" style="max-width: 420px;">Welcome {{ user.first_name|default:user.username }}! Run your first SEO audit to see insights, scores, and recommendations here.</p>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+                        <a href="{% url 'calculator:calculator' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Run your first audit</a>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-dark"><i class="bi bi-person me-1" aria-hidden="true"></i> Complete profile</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

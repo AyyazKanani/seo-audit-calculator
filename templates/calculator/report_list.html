@@ -21,7 +21,7 @@
             <div class="card border-0 shadow-sm mb-4" data-aos="fade-up" data-aos-delay="50" style="background: var(--surface); border: 1px solid var(--border);">
                 <div class="card-body">
                     <form method="get" class="row g-2 align-items-end">
-                        <div class="col-12 col-md-6">
+                        <div class="col-12 col-md-5">
                             <label for="q" class="form-label small fw-semibold" style="color: var(--text-muted);">Search</label>
                             <div class="input-group">
                                 <span class="input-group-text" style="background: var(--bg); border-color: var(--border); color: var(--text-muted);"><i class="bi bi-search" aria-hidden="true"></i></span>
@@ -38,9 +38,9 @@
                                 <option value="D" {% if grade == "D" %}selected{% endif %}>Poor (0–39)</option>
                             </select>
                         </div>
-                        <div class="col-12 col-md-2 d-grid d-md-flex gap-2">
-                            <button type="submit" class="btn btn-primary flex-grow-1">Apply</button>
-                            {% if q or grade %}<a href="{% url 'calculator:reports' %}" class="btn btn-outline-dark">Clear</a>{% endif %}
+                        <div class="col-12 col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">Apply</button>
+                            {% if q or grade %}<a href="{% url 'calculator:reports' %}" class="btn btn-outline-dark flex-fill">Clear</a>{% endif %}
                         </div>
                     </form>
                 </div>

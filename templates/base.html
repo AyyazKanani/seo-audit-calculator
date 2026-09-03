@@ -29,6 +29,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'core:home' %}">Home</a>
                     </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'calculator:calculator' %}">Audit Tool</a>
                     </li>
@@ -45,6 +50,7 @@
                             <i class="bi bi-person-circle me-1"></i>{{ user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'dashboard:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
                             <li><a class="dropdown-item" href="{% url 'calculator:reports' %}"><i class="bi bi-collection me-2"></i>My Reports</a></li>
                             <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2"></i>Profile</a></li>
                             <li><a class="dropdown-item" href="{% url 'accounts:change_password' %}"><i class="bi bi-shield-lock me-2"></i>Change Password</a></li>
