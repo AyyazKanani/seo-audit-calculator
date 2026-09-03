@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Result {{ report.overall_score }}/100 | SEO Audit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-9">
+
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4" data-aos="fade-up">
+                <a href="{% url 'calculator:calculator' %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-arrow-left me-1"></i> New Audit</a>
+                <span class="text-muted small">Report #{{ report.pk }} • {{ report.created_at|date:"M d, Y H:i" }}</span>
+            </div>
+
+            <!-- Overall -->
+            <div class="result-hero text-center mb-4" data-aos="fade-up" data-aos-delay="50">
+                <div class="score-circle score-{{ report.grade|lower }}">
+                    <span class="score-number">{{ report.overall_score }}</span>
+                    <span class="score-total">/ 100</span>
+                </div>
+                <h2 class="fw-bold mt-3" style="color: var(--text);">Grade {{ report.grade }} — {{ report.grade_label }}</h2>
+                <p class="text-muted">Target keyword: <strong style="color: var(--primary-light);">{{ report.target_keyword }}</strong> • {{ report.word_count }} words</p>
+                <p class="small text-muted text-break">{{ report.url }}</p>
+            </div>
+
+            <!-- Scores grid -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-4" data-aos="fade-up" data-aos-delay="80">
+                    <div class="score-card">
+                        <div class="score-card-header">
+                            <i class="bi bi-type"></i> Title
+                        </div>
+                        <div class="score-value">{{ report.title_score }}<span>/100</span></div>
+                        <div class="progress score-progress">
+                            <div class="progress-bar" style="width: {{ report.title_score }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ report.title|truncatechars:60 }}</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="score-card">
+                        <div class="score-card-header"><i class="bi bi-card-text"></i> Meta</div>
+                        <div class="score-value">{{ report.meta_score }}<span>/100</span></div>
+                        <div class="progress score-progress">
+                            <div class="progress-bar" style="width: {{ report.meta_score }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ report.meta_description|truncatechars:70 }}</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-4" data-aos="fade-up" data-aos-delay="120">
+                    <div class="score-card">
+                        <div class="score-card-header"><i class="bi bi-link-45deg"></i> URL</div>
+                        <div class="score-value">{{ report.url_score }}<span>/100</span></div>
+                        <div class="progress score-progress">
+                            <div class="progress-bar" style="width: {{ report.url_score }}%"></div>
+                        </div>
+                        <small class="text-muted text-break">{{ report.url|truncatechars:40 }}</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-6" data-aos="fade-up" data-aos-delay="140">
+                    <div class="score-card">
+                        <div class="score-card-header"><i class="bi bi-file-text"></i> Content</div>
+                        <div class="score-value">{{ report.content_score }}<span>/100</span></div>
+                        <div class="progress score-progress">
+                            <div class="progress-bar" style="width: {{ report.content_score }}%"></div>
+                        </div>
+                        <small class="text-muted">{{ report.word_count }} words</small>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="160">
+                    <div class="score-card">
+                        <div class="score-card-header"><i class="bi bi-bullseye"></i> Keyword Density</div>
+                        <div class="score-value">{{ report.keyword_density }}<span>%</span></div>
+                        <div class="progress score-progress">
+                            <div class="progress-bar density-bar" data-density="{{ report.keyword_density }}" style="width: 50%"></div>
+                        </div>
+                        <small class="text-muted">Ideal 1-2.5% — "{{ report.target_keyword }}"</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="recommendations-card" data-aos="fade-up" data-aos-delay="180">
+                <h5 class="fw-bold mb-3" style="color: var(--text);"><i class="bi bi-lightbulb me-2" style="color: var(--warning);"></i>Recommendations</h5>
+                <ul class="recommendations-list">
+                    {% for tip in report.recommendations %}
+                    <li><i class="bi bi-check2-circle me-2"></i>{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="200">
+                <a href="{% url 'calculator:calculator' %}" class="btn btn-primary btn-lg"><i class="bi bi-arrow-repeat me-2"></i>Audit Another Page</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.density-bar').forEach(function(bar){
+        var d = parseFloat(bar.dataset.density || 0);
+        // width visual: 0-5% maps to 0-100%
+        var w = Math.min((d / 5) * 100, 100);
+        bar.style.width = w + '%';
+        if (d >= 1 && d <= 2.5) bar.style.background = 'var(--success)';
+        else if (d >= 0.5 && d <= 3.5) bar.style.background = 'var(--warning)';
+        else bar.style.background = 'var(--danger)';
+    });
+});
+</script>
+{% endblock %}

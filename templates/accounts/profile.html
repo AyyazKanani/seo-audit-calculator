@@ -8,7 +8,7 @@
     <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
         <div class="auth-card" data-aos="fade-up">
             <div class="text-center mb-4">
-                <img src="{{ user.profile.image.url }}" alt="Profile" class="profile-img mb-3">
+                <img src="{{ user.profile.image.url }}" alt="{{ user.username }}'s profile picture" class="profile-img mb-3">
                 <h3 class="fw-bold">{{ user.get_full_name|default:user.username }}</h3>
                 <p class="text-muted">@{{ user.username }}</p>
             </div>
@@ -24,7 +24,7 @@
                 </div>
                 <div class="profile-row">
                     <span class="profile-label">Last Login</span>
-                    <span class="profile-value">{{ user.last_login|date:"M d, Y H:i" }}</span>
+                    <span class="profile-value">{{ user.last_login|date:"M d, Y H:i"|default:"Never" }}</span>
                 </div>
                 {% if user.profile.bio %}
                 <div class="profile-row">

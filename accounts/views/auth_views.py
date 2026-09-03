@@ -3,8 +3,12 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.views.decorators.http import require_http_methods
 from ..forms import UserRegisterForm, UserLoginForm
+
+MAX_FAILED_ATTEMPTS = 5
+LOCKOUT_SECONDS = 300
 
 
 @require_http_methods(["GET", "POST"])
@@ -31,20 +35,26 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect("core:home")
 
+    cache_key = f"login_failures_{request.META.get('REMOTE_ADDR')}"
+    failures = cache.get(cache_key, 0)
+
     if request.method == "POST":
+        if failures >= MAX_FAILED_ATTEMPTS:
+            messages.error(
+                request,
+                f"Too many failed attempts. Try again in {LOCKOUT_SECONDS // 60} minutes.",
+            )
+            return render(request, "accounts/login.html", {"form": UserLoginForm()})
+
         form = UserLoginForm(request.POST)
         if form.is_valid():
             login_field = form.cleaned_data["login"]
             password = form.cleaned_data["password"]
             remember = form.cleaned_data["remember_me"]
 
-            # Support login with username or email
             if "@" in login_field:
-                username = (
-                    User.objects.filter(email=login_field).first().username
-                    if User.objects.filter(email=login_field).exists()
-                    else login_field
-                )
+                user_match = User.objects.filter(email=login_field).first()
+                username = user_match.username if user_match else login_field
             else:
                 username = login_field
 
@@ -52,6 +62,7 @@ def login_view(request):
 
             if user is not None:
                 login(request, user)
+                cache.delete(cache_key)
                 if not remember:
                     request.session.set_expiry(0)  # Session expires on browser close
                 messages.success(request, f"Welcome back, {user.first_name or user.username}!")
@@ -60,6 +71,9 @@ def login_view(request):
                     return redirect(next_url)
                 return redirect("core:home")
             else:
+                cache.set(
+                    cache_key, failures + 1, LOCKOUT_SECONDS
+                )
                 messages.error(request, "Invalid username/email or password.")
     else:
         form = UserLoginForm()
@@ -68,6 +82,7 @@ def login_view(request):
 
 
 @login_required
+@require_http_methods(["POST"])
 def logout_view(request):
     logout(request)
     messages.info(request, "You have been logged out.")

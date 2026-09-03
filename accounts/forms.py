@@ -1,6 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import (
+    UserCreationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+)
 from .models import Profile
 
 
@@ -12,12 +16,16 @@ class UserRegisterForm(UserCreationForm):
     first_name = forms.CharField(
         max_length=30,
         required=True,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "First Name"}),
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "First Name"}
+        ),
     )
     last_name = forms.CharField(
         max_length=30,
         required=True,
-        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Last Name"}),
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Last Name"}
+        ),
     )
 
     class Meta:
@@ -104,3 +112,22 @@ class ProfileUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["image"].widget.attrs.update({"class": "form-control"})
+
+
+class BootstrapPasswordResetForm(PasswordResetForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Email Address"}
+        )
+
+
+class BootstrapSetPasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["new_password1"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "New Password"}
+        )
+        self.fields["new_password2"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Confirm New Password"}
+        )

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SEO Calculator | SEO Audit Calculator{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-9">
+            <div class="text-center mb-4" data-aos="fade-up">
+                <span class="hero-badge"><i class="bi bi-calculator"></i> SEO Calculator</span>
+                <h1 class="fw-bold" style="color: var(--text);">Audit Your Page</h1>
+                <p class="text-muted mx-auto" style="max-width: 560px;">Paste your page details below. We score 5 factors, compute keyword density, and save the report instantly.</p>
+            </div>
+
+            <div class="calc-card" data-aos="fade-up" data-aos-delay="100">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="{{ form.url.id_for_label }}" class="form-label">Page URL</label>
+                            {{ form.url }}
+                            {% if form.url.errors %}<div class="invalid-feedback d-block">{{ form.url.errors.0 }}</div>{% endif %}
+                            <div class="form-text">{{ form.url.help_text }}</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Title Tag</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}<div class="invalid-feedback d-block">{{ form.title.errors.0 }}</div>{% endif %}
+                            <div class="form-text">{{ form.title.help_text }} — <span id="title-count">0</span>/60</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.meta_description.id_for_label }}" class="form-label">Meta Description</label>
+                            {{ form.meta_description }}
+                            {% if form.meta_description.errors %}<div class="invalid-feedback d-block">{{ form.meta_description.errors.0 }}</div>{% endif %}
+                            <div class="form-text">{{ form.meta_description.help_text }} — <span id="meta-count">0</span>/160</div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="{{ form.target_keyword.id_for_label }}" class="form-label">Target Keyword</label>
+                            {{ form.target_keyword }}
+                            {% if form.target_keyword.errors %}<div class="invalid-feedback d-block">{{ form.target_keyword.errors.0 }}</div>{% endif %}
+                            <div class="form-text">{{ form.target_keyword.help_text }}</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.content.id_for_label }}" class="form-label">Page Content</label>
+                            {{ form.content }}
+                            {% if form.content.errors %}<div class="invalid-feedback d-block">{{ form.content.errors.0 }}</div>{% endif %}
+                            <div class="form-text">Words: <span id="word-count">0</span> — aim 600+</div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid d-md-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                            <i class="bi bi-graph-up me-2"></i>Calculate SEO Score
+                        </button>
+                        <button type="reset" class="btn btn-outline-dark">Clear</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="calc-info mt-4" data-aos="fade-up" data-aos-delay="150">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <div class="info-card">
+                            <i class="bi bi-lightbulb"></i>
+                            <h6>How scoring works</h6>
+                            <p>Each factor 0-100. Overall is weighted: Title 25, Meta 20, URL 15, Content 25, Density 15.</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="info-card">
+                            <i class="bi bi-bullseye"></i>
+                            <h6>Ideal keyword density</h6>
+                            <p>1% - 2.5% is healthy. Below 0.5% is weak, above 3.5% looks spammy.</p>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="info-card">
+                            <i class="bi bi-database"></i>
+                            <h6>Every report saved</h6>
+                            <p>We store inputs + scores so you can track improvements over time.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const title = document.getElementById('{{ form.title.id_for_label }}');
+    const meta = document.getElementById('{{ form.meta_description.id_for_label }}');
+    const content = document.getElementById('{{ form.content.id_for_label }}');
+    const tCount = document.getElementById('title-count');
+    const mCount = document.getElementById('meta-count');
+    const wCount = document.getElementById('word-count');
+    function upd() {
+        if (title && tCount) tCount.textContent = title.value.length;
+        if (meta && mCount) mCount.textContent = meta.value.length;
+        if (content && wCount) wCount.textContent = content.value.trim() ? content.value.trim().split(/\s+/).length : 0;
+    }
+    [title, meta, content].forEach(el => el && el.addEventListener('input', upd));
+    upd();
+});
+</script>
+{% endblock %}

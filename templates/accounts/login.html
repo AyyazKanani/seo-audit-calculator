@@ -27,7 +27,7 @@
                     <label for="id_password" class="form-label">Password</label>
                     <div class="input-group">
                         {{ form.password }}
-                        <button class="btn btn-outline-secondary toggle-password" type="button">
+                        <button class="btn btn-outline-secondary toggle-password" type="button" aria-label="Show password">
                             <i class="bi bi-eye"></i>
                         </button>
                     </div>
@@ -53,22 +53,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.querySelectorAll(".toggle-password").forEach(function(btn) {
-    btn.addEventListener("click", function() {
-        var input = this.closest(".input-group").querySelector("input");
-        var icon = this.querySelector("i");
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.replace("bi-eye", "bi-eye-slash");
-        } else {
-            input.type = "password";
-            icon.classList.replace("bi-eye-slash", "bi-eye");
-        }
-    });
-});
-</script>
 {% endblock %}
