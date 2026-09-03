@@ -6,92 +6,208 @@
 {% block content %}
 <div class="container py-4 py-md-5">
     <div class="row justify-content-center">
-        <div class="col-12 col-lg-10 col-xl-9">
+        <div class="col-12 col-xl-10">
 
+            <!-- Top bar -->
             <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4" data-aos="fade-up">
-                <a href="{% url 'calculator:calculator' %}" class="btn btn-outline-dark btn-sm"><i class="bi bi-arrow-left me-1"></i> New Audit</a>
-                <span class="text-muted small">Report #{{ report.pk }} • {{ report.created_at|date:"M d, Y H:i" }}</span>
+                <a href="{% url 'calculator:calculator' %}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> New Audit
+                </a>
+                <span class="badge bg-dark border text-muted fw-medium">
+                    <i class="bi bi-hash me-1" aria-hidden="true"></i>Report #{{ report.pk }} • {{ report.created_at|date:"M d, Y H:i" }}
+                </span>
             </div>
 
-            <!-- Overall -->
-            <div class="result-hero text-center mb-4" data-aos="fade-up" data-aos-delay="50">
-                <div class="score-circle score-{{ report.grade|lower }}">
-                    <span class="score-number">{{ report.overall_score }}</span>
-                    <span class="score-total">/ 100</span>
+            <!-- Overall score card -->
+            <div class="card overall-card border-0 shadow-sm mb-4 overflow-hidden" data-aos="fade-up" data-aos-delay="50">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row align-items-center g-4">
+                        <!-- Circular progress -->
+                        <div class="col-12 col-md-5 text-center">
+                            <div class="circular-progress grade-{{ report.grade|lower }} mx-auto" style="--score: {{ report.overall_score }};" role="img" aria-label="Overall SEO score {{ report.overall_score }} out of 100, grade {{ report.grade }} {{ report.grade_label }}">
+                                <svg width="160" height="160" viewBox="0 0 120 120" class="circular-svg" aria-hidden="true">
+                                    <title>Overall score {{ report.overall_score }}/100</title>
+                                    <circle cx="60" cy="60" r="52" class="track"></circle>
+                                    <circle cx="60" cy="60" r="52" class="progress"></circle>
+                                </svg>
+                                <div class="circular-center" aria-hidden="true">
+                                    <span class="circular-number">{{ report.overall_score }}</span>
+                                    <span class="circular-total">/100</span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge rounded-pill grade-badge grade-{{ report.grade|lower }} px-3 py-2">
+                                    Grade {{ report.grade }} — {{ report.grade_label }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Details -->
+                        <div class="col-12 col-md-7">
+                            <span class="text-uppercase small fw-semibold" style="letter-spacing:.08em; color: var(--primary-light);">Audit Overview</span>
+                            <h3 class="fw-bold mt-1 mb-3" style="color: var(--text);">Your page is <span class="text-gradient">{{ report.grade_label }}</span></h3>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <div class="mini-stat">
+                                        <span class="mini-label"><i class="bi bi-bullseye me-1" aria-hidden="true"></i>Keyword</span>
+                                        <span class="mini-value">{{ report.target_keyword }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mini-stat">
+                                        <span class="mini-label"><i class="bi bi-file-text me-1" aria-hidden="true"></i>Words</span>
+                                        <span class="mini-value">{{ report.word_count }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mini-stat">
+                                        <span class="mini-label"><i class="bi bi-link-45deg me-1" aria-hidden="true"></i>URL</span>
+                                        <span class="mini-value text-break">{{ report.url }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-dark border text-muted fw-normal"><i class="bi bi-type me-1" aria-hidden="true"></i>Title: {{ report.title_score }}/100</span>
+                                <span class="badge bg-dark border text-muted fw-normal"><i class="bi bi-card-text me-1" aria-hidden="true"></i>Meta: {{ report.meta_score }}/100</span>
+                                <span class="badge bg-dark border text-muted fw-normal"><i class="bi bi-bullseye me-1" aria-hidden="true"></i>{{ report.keyword_density }}% density</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h2 class="fw-bold mt-3" style="color: var(--text);">Grade {{ report.grade }} — {{ report.grade_label }}</h2>
-                <p class="text-muted">Target keyword: <strong style="color: var(--primary-light);">{{ report.target_keyword }}</strong> • {{ report.word_count }} words</p>
-                <p class="small text-muted text-break">{{ report.url }}</p>
             </div>
 
-            <!-- Scores grid -->
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-4" data-aos="fade-up" data-aos-delay="80">
-                    <div class="score-card">
-                        <div class="score-card-header">
-                            <i class="bi bi-type"></i> Title
+            <!-- Metric cards -->
+            <div class="row g-3 g-md-4 mb-4">
+                <!-- Title -->
+                <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="70">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-indigo" aria-hidden="true"><i class="bi bi-type"></i></div>
+                                <span class="badge metric-badge grade-{% if report.title_score >= 80 %}a{% elif report.title_score >= 60 %}b{% elif report.title_score >= 40 %}c{% else %}d{% endif %}">{{ report.title_score }}<small>/100</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Title Tag</h6>
+                            <p class="small text-muted mb-3">Ideal 50–60 chars</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar {% if report.title_score >= 80 %}bg-success{% elif report.title_score >= 60 %}bg-lime{% elif report.title_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ report.title_score }}%;" aria-valuenow="{{ report.title_score }}" aria-valuemin="0" aria-valuemax="100" aria-label="Title score {{ report.title_score }} out of 100"></div>
+                            </div>
+                            <p class="small text-muted mt-2 mb-0 text-truncate" title="{{ report.title }}"><i class="bi bi-quote me-1" aria-hidden="true"></i>{{ report.title|truncatechars:62 }}</p>
                         </div>
-                        <div class="score-value">{{ report.title_score }}<span>/100</span></div>
-                        <div class="progress score-progress">
-                            <div class="progress-bar" style="width: {{ report.title_score }}%"></div>
-                        </div>
-                        <small class="text-muted">{{ report.title|truncatechars:60 }}</small>
                     </div>
                 </div>
-                <div class="col-6 col-md-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="score-card">
-                        <div class="score-card-header"><i class="bi bi-card-text"></i> Meta</div>
-                        <div class="score-value">{{ report.meta_score }}<span>/100</span></div>
-                        <div class="progress score-progress">
-                            <div class="progress-bar" style="width: {{ report.meta_score }}%"></div>
+
+                <!-- Meta -->
+                <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="90">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-cyan" aria-hidden="true"><i class="bi bi-card-text"></i></div>
+                                <span class="badge metric-badge grade-{% if report.meta_score >= 80 %}a{% elif report.meta_score >= 60 %}b{% elif report.meta_score >= 40 %}c{% else %}d{% endif %}">{{ report.meta_score }}<small>/100</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Meta Description</h6>
+                            <p class="small text-muted mb-3">Ideal 120–160 chars</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar {% if report.meta_score >= 80 %}bg-success{% elif report.meta_score >= 60 %}bg-lime{% elif report.meta_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ report.meta_score }}%;" aria-valuenow="{{ report.meta_score }}" aria-valuemin="0" aria-valuemax="100" aria-label="Meta description score {{ report.meta_score }} out of 100"></div>
+                            </div>
+                            <p class="small text-muted mt-2 mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ report.meta_description|truncatechars:82 }}</p>
                         </div>
-                        <small class="text-muted">{{ report.meta_description|truncatechars:70 }}</small>
                     </div>
                 </div>
-                <div class="col-6 col-md-4" data-aos="fade-up" data-aos-delay="120">
-                    <div class="score-card">
-                        <div class="score-card-header"><i class="bi bi-link-45deg"></i> URL</div>
-                        <div class="score-value">{{ report.url_score }}<span>/100</span></div>
-                        <div class="progress score-progress">
-                            <div class="progress-bar" style="width: {{ report.url_score }}%"></div>
+
+                <!-- URL -->
+                <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="110">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-slate" aria-hidden="true"><i class="bi bi-link-45deg"></i></div>
+                                <span class="badge metric-badge grade-{% if report.url_score >= 80 %}a{% elif report.url_score >= 60 %}b{% elif report.url_score >= 40 %}c{% else %}d{% endif %}">{{ report.url_score }}<small>/100</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">URL Structure</h6>
+                            <p class="small text-muted mb-3">Short, hyphens, keyword</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar {% if report.url_score >= 80 %}bg-success{% elif report.url_score >= 60 %}bg-lime{% elif report.url_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ report.url_score }}%;" aria-valuenow="{{ report.url_score }}" aria-valuemin="0" aria-valuemax="100" aria-label="URL score {{ report.url_score }} out of 100"></div>
+                            </div>
+                            <p class="small text-muted mt-2 mb-0 text-break">{{ report.url|truncatechars:42 }}</p>
                         </div>
-                        <small class="text-muted text-break">{{ report.url|truncatechars:40 }}</small>
                     </div>
                 </div>
-                <div class="col-6 col-md-6" data-aos="fade-up" data-aos-delay="140">
-                    <div class="score-card">
-                        <div class="score-card-header"><i class="bi bi-file-text"></i> Content</div>
-                        <div class="score-value">{{ report.content_score }}<span>/100</span></div>
-                        <div class="progress score-progress">
-                            <div class="progress-bar" style="width: {{ report.content_score }}%"></div>
+
+                <!-- Content -->
+                <div class="col-12 col-md-6 col-lg-6" data-aos="fade-up" data-aos-delay="130">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-green" aria-hidden="true"><i class="bi bi-file-text"></i></div>
+                                <span class="badge metric-badge grade-{% if report.content_score >= 80 %}a{% elif report.content_score >= 60 %}b{% elif report.content_score >= 40 %}c{% else %}d{% endif %}">{{ report.content_score }}<small>/100</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Content Quality</h6>
+                            <p class="small text-muted mb-3">{{ report.word_count }} words • ideal 600–1500</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar {% if report.content_score >= 80 %}bg-success{% elif report.content_score >= 60 %}bg-lime{% elif report.content_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ report.content_score }}%;" aria-valuenow="{{ report.content_score }}" aria-valuemin="0" aria-valuemax="100" aria-label="Content score {{ report.content_score }} out of 100"></div>
+                            </div>
+                            <div class="d-flex gap-2 mt-3">
+                                <span class="badge bg-dark border text-muted fw-normal small">{{ report.word_count }} words</span>
+                                <span class="badge bg-dark border text-muted fw-normal small">First 100w keyword {% if report.content_score >= 70 %}found{% else %}check{% endif %}</span>
+                            </div>
                         </div>
-                        <small class="text-muted">{{ report.word_count }} words</small>
                     </div>
                 </div>
-                <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="160">
-                    <div class="score-card">
-                        <div class="score-card-header"><i class="bi bi-bullseye"></i> Keyword Density</div>
-                        <div class="score-value">{{ report.keyword_density }}<span>%</span></div>
-                        <div class="progress score-progress">
-                            <div class="progress-bar density-bar" data-density="{{ report.keyword_density }}" style="width: 50%"></div>
+
+                <!-- Keyword Density -->
+                <div class="col-12 col-md-6 col-lg-6" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-amber" aria-hidden="true"><i class="bi bi-bullseye"></i></div>
+                                <span class="badge metric-badge grade-{% if report.keyword_density >= 1 and report.keyword_density <= 2.5 %}a{% elif report.keyword_density >= 0.5 and report.keyword_density <= 3.5 %}c{% else %}d{% endif %}">{{ report.keyword_density }}<small>%</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Keyword Density</h6>
+                            <p class="small text-muted mb-3">Ideal 1–2.5% for "{{ report.target_keyword }}"</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar density-bar" role="progressbar" data-density="{{ report.keyword_density }}" style="width: 50%;" aria-label="Keyword density {{ report.keyword_density }} percent"></div>
+                            </div>
+                            <p class="small mt-2 mb-0">
+                                {% if report.keyword_density >= 1 and report.keyword_density <= 2.5 %}
+                                    <span class="text-success"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Ideal range</span>
+                                {% elif report.keyword_density >= 0.5 and report.keyword_density <= 3.5 %}
+                                    <span class="text-warning"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Near ideal</span>
+                                {% else %}
+                                    <span class="text-danger"><i class="bi bi-x-circle me-1" aria-hidden="true"></i>Needs adjustment</span>
+                                {% endif %}
+                            </p>
                         </div>
-                        <small class="text-muted">Ideal 1-2.5% — "{{ report.target_keyword }}"</small>
                     </div>
                 </div>
             </div>
 
             <!-- Recommendations -->
-            <div class="recommendations-card" data-aos="fade-up" data-aos-delay="180">
-                <h5 class="fw-bold mb-3" style="color: var(--text);"><i class="bi bi-lightbulb me-2" style="color: var(--warning);"></i>Recommendations</h5>
-                <ul class="recommendations-list">
+            <div class="card reco-card border-0 shadow-sm mb-4" data-aos="fade-up" data-aos-delay="170">
+                <div class="card-header bg-transparent border-bottom d-flex align-items-center gap-2 py-3" style="border-color: var(--border) !important;">
+                    <div class="reco-header-icon" aria-hidden="true"><i class="bi bi-lightbulb-fill"></i></div>
+                    <h5 class="mb-0 fw-bold" style="color: var(--text);">Action Plan</h5>
+                    <span class="badge bg-dark border text-muted ms-auto">{{ report.recommendations|length }} steps</span>
+                </div>
+                <ul class="list-group list-group-flush">
                     {% for tip in report.recommendations %}
-                    <li><i class="bi bi-check2-circle me-2"></i>{{ tip }}</li>
+                    <li class="list-group-item reco-item d-flex gap-3 align-items-start">
+                        <span class="reco-number" aria-hidden="true">{{ forloop.counter }}</span>
+                        <span class="flex-grow-1">{{ tip }}</span>
+                        <i class="bi bi-chevron-right text-muted small mt-1 d-none d-md-block" aria-hidden="true"></i>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
 
-            <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="200">
-                <a href="{% url 'calculator:calculator' %}" class="btn btn-primary btn-lg"><i class="bi bi-arrow-repeat me-2"></i>Audit Another Page</a>
+            <!-- CTA -->
+            <div class="text-center d-flex flex-wrap gap-2 justify-content-center" data-aos="fade-up" data-aos-delay="190">
+                <a href="{% url 'calculator:calculator' %}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-arrow-repeat me-2" aria-hidden="true"></i>Audit Another Page
+                </a>
+                <a href="{% url 'core:home' %}" class="btn btn-outline-dark">
+                    <i class="bi bi-house me-1" aria-hidden="true"></i> Home
+                </a>
             </div>
 
         </div>
@@ -104,7 +220,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.density-bar').forEach(function(bar){
         var d = parseFloat(bar.dataset.density || 0);
-        // width visual: 0-5% maps to 0-100%
         var w = Math.min((d / 5) * 100, 100);
         bar.style.width = w + '%';
         if (d >= 1 && d <= 2.5) bar.style.background = 'var(--success)';

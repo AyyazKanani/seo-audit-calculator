@@ -609,7 +609,206 @@ html:not(.js) [data-aos] {
     line-height: 1.5;
 }
 
-/* ===== RESULT ===== */
+/* ===== RESULT — SaaS REDESIGN ===== */
+.overall-card {
+    background: var(--surface);
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-lg);
+}
+
+.mini-stat {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+}
+
+.mini-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+}
+
+.mini-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    word-break: break-word;
+}
+
+/* Circular progress */
+.circular-progress {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    --grade-color: var(--primary);
+}
+
+.circular-progress.grade-a { --grade-color: var(--success); }
+.circular-progress.grade-b { --grade-color: #84cc16; }
+.circular-progress.grade-c { --grade-color: var(--warning); }
+.circular-progress.grade-d { --grade-color: var(--danger); }
+
+.circular-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circular-svg .track {
+    fill: none;
+    stroke: var(--bg);
+    stroke-width: 10;
+}
+
+.circular-svg .progress {
+    fill: none;
+    stroke: var(--grade-color);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 326.56;
+    stroke-dashoffset: calc(326.56 - (326.56 * var(--score) / 100));
+    transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--grade-color) 40%, transparent));
+}
+
+.circular-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.circular-number {
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text);
+}
+
+.circular-total {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.grade-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--border);
+}
+
+.grade-badge.grade-a { background: rgba(34,197,94,.15) !important; color: var(--success) !important; border-color: rgba(34,197,94,.3); }
+.grade-badge.grade-b { background: rgba(132,204,22,.15) !important; color: #84cc16 !important; border-color: rgba(132,204,22,.3); }
+.grade-badge.grade-c { background: rgba(245,158,11,.15) !important; color: var(--warning) !important; border-color: rgba(245,158,11,.3); }
+.grade-badge.grade-d { background: rgba(239,68,68,.15) !important; color: var(--danger) !important; border-color: rgba(239,68,68,.3); }
+
+/* Metric cards — Bootstrap card restyled */
+.metric-card {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border)) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+
+.metric-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    color: #fff;
+}
+
+.metric-icon.bg-indigo { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+.metric-icon.bg-cyan { background: linear-gradient(135deg, var(--accent), #0891b2); }
+.metric-icon.bg-slate { background: linear-gradient(135deg, #475569, #334155); }
+.metric-icon.bg-green { background: linear-gradient(135deg, var(--success), #16a34a); }
+.metric-icon.bg-amber { background: linear-gradient(135deg, var(--warning), #d97706); }
+
+.metric-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: var(--bg) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border);
+    padding: 0.35rem 0.6rem;
+}
+
+.metric-badge small { font-weight: 600; color: var(--text-muted); }
+
+/* Color-coded metric badges — reuse grade palette for consistency */
+.metric-badge.grade-a { background: rgba(34,197,94,.15) !important; color: var(--success) !important; border-color: rgba(34,197,94,.3) !important; }
+.metric-badge.grade-b { background: rgba(132,204,22,.15) !important; color: #84cc16 !important; border-color: rgba(132,204,22,.3) !important; }
+.metric-badge.grade-c { background: rgba(245,158,11,.15) !important; color: var(--warning) !important; border-color: rgba(245,158,11,.3) !important; }
+.metric-badge.grade-d { background: rgba(239,68,68,.15) !important; color: var(--danger) !important; border-color: rgba(239,68,68,.3) !important; }
+.metric-badge.grade-a small,
+.metric-badge.grade-b small,
+.metric-badge.grade-c small,
+.metric-badge.grade-d small { color: inherit; opacity: .85; }
+
+/* Recommendations */
+.reco-card {
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+}
+
+.reco-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(245,158,11,.15);
+    color: var(--warning);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.reco-item {
+    background: transparent !important;
+    border-color: rgba(51,65,85,.45) !important;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    padding: 1rem 1.25rem !important;
+    transition: background .15s ease;
+}
+
+.reco-item:hover {
+    background: rgba(51,65,85,.25) !important;
+}
+
+.reco-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--primary-light);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Legacy support — keep old simple circle if referenced elsewhere */
 .result-hero {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(6, 182, 212, 0.08));
     border: 1px solid var(--border);
@@ -617,109 +816,19 @@ html:not(.js) [data-aos] {
     padding: 2.5rem 1.5rem;
 }
 
-.score-circle {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 6px solid var(--border);
-    background: var(--bg);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+/* Metric progress colors */
+.progress-bar.bg-lime { background-color: #84cc16 !important; }
+.progress-bar.bg-success { background-color: var(--success) !important; }
+.progress-bar.bg-warning { background-color: var(--warning) !important; }
+.progress-bar.bg-danger { background-color: var(--danger) !important; }
+
+/* Accessibility — visible focus */
+.btn:focus-visible,
+a:focus-visible,
+.card:focus-within {
+    outline: 2px solid var(--primary-light);
+    outline-offset: 2px;
 }
-
-.score-circle.score-a { border-color: var(--success); }
-.score-circle.score-b { border-color: #84cc16; }
-.score-circle.score-c { border-color: var(--warning); }
-.score-circle.score-d { border-color: var(--danger); }
-
-.score-number {
-    font-size: 2.8rem;
-    font-weight: 800;
-    line-height: 1;
-    color: var(--text);
-}
-
-.score-total {
-    font-size: 1rem;
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-.score-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem;
-    height: 100%;
-}
-
-.score-card-header {
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
-}
-
-.score-card-header i { margin-right: 0.35rem; }
-
-.score-value {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--text);
-    line-height: 1;
-}
-
-.score-value span {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-.score-progress {
-    height: 6px;
-    background: var(--bg);
-    border-radius: 50px;
-    margin: 0.75rem 0;
-    overflow: hidden;
-}
-
-.score-progress .progress-bar {
-    background: linear-gradient(90deg, var(--primary), var(--accent));
-    border-radius: 50px;
-    transition: width 0.8s ease;
-}
-
-.recommendations-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.75rem;
-}
-
-.recommendations-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.recommendations-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.65rem 0;
-    border-bottom: 1px solid rgba(51, 65, 85, 0.4);
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.recommendations-list li:last-child { border-bottom: none; }
-.recommendations-list li i { color: var(--success); flex-shrink: 0; margin-top: 0.2rem; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 576px) {
@@ -732,6 +841,8 @@ html:not(.js) [data-aos] {
         padding: 3rem 0 2rem;
     }
 
+    .circular-progress { width: 140px; height: 140px; }
+    .circular-number { font-size: 2.2rem; }
     .score-circle { width: 120px; height: 120px; }
     .score-number { font-size: 2.2rem; }
 }
