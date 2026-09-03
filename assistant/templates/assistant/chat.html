@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AI SEO Assistant | SEO Audit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-9">
+
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3" data-aos="fade-up">
+                <div>
+                    <h2 class="fw-bold mb-1" style="color: var(--text);"><i class="bi bi-robot me-2" aria-hidden="true"></i>AI SEO Assistant</h2>
+                    <p class="text-muted small mb-0">Ask about titles, meta, keywords, content, URLs, speed, images…</p>
+                </div>
+                <form id="clear-form" method="post" action="{% url 'assistant:clear' %}" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-dark btn-sm"><i class="bi bi-trash me-1" aria-hidden="true"></i> Clear chat</button>
+                </form>
+            </div>
+
+            <!-- Chat window -->
+            <div class="card dash-card border-0 shadow-sm d-flex flex-column" style="height: min(70vh, 620px);" data-aos="fade-up" data-aos-delay="50">
+                <div id="chat-history" class="flex-grow-1 overflow-auto p-3 p-md-4" style="scroll-behavior: smooth;" role="log" aria-live="polite">
+                    {% for m in messages %}
+                        {% if m.role == "user" %}
+                        <div class="d-flex justify-content-end mb-3">
+                            <div class="chat-bubble chat-user">{{ m.content|linebreaksbr }}</div>
+                        </div>
+                        {% else %}
+                        <div class="d-flex justify-content-start mb-3">
+                            <div class="chat-bubble chat-assistant">{{ m.content|linebreaksbr }}</div>
+                        </div>
+                        {% endif %}
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <div class="mx-auto mb-3 d-inline-flex align-items-center justify-content-center rounded-circle" style="width:56px;height:56px;background: rgba(99,102,241,.12); border:1px solid rgba(99,102,241,.2); color: var(--primary-light);" aria-hidden="true"><i class="bi bi-chat-dots"></i></div>
+                        <p class="small text-muted mb-2">Try: “How do I write a good title?” or “What is backlink?”</p>
+                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                            <button class="btn btn-sm btn-outline-dark quick-prompt" data-prompt="How do I write a good title tag?">Title</button>
+                            <button class="btn btn-sm btn-outline-dark quick-prompt" data-prompt="What is keyword density?">Keyword</button>
+                            <button class="btn btn-sm btn-outline-dark quick-prompt" data-prompt="How to improve page speed?">Speed</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Input -->
+                <div class="border-top p-3" style="border-color: var(--border) !important; background: var(--surface);">
+                    <form id="chat-form" class="d-flex gap-2">
+                        <input type="text" id="chat-input" class="form-control flex-grow-1" placeholder="Ask about SEO…" maxlength="2000" autocomplete="off" aria-label="Ask SEO question" style="background: var(--bg); border-color: var(--border); color: var(--text);">
+                        <button type="submit" class="btn btn-primary px-4 flex-shrink-0" aria-label="Send message"><i class="bi bi-send me-1" aria-hidden="true"></i> Send</button>
+                    </form>
+                    <div id="chat-error" class="small text-danger mt-2 d-none"></div>
+                </div>
+            </div>
+
+            <p class="small text-muted mt-2"><i class="bi bi-shield-check me-1" aria-hidden="true"></i>Dummy mode — no external API. Swap provider via <code>AI_PROVIDER</code> env.</p>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+  const historyEl = document.getElementById('chat-history');
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('chat-input');
+  const errorEl = document.getElementById('chat-error');
+  const clearForm = document.getElementById('clear-form');
+
+  function scrollToBottom() {
+    if (historyEl) historyEl.scrollTop = historyEl.scrollHeight;
+  }
+  scrollToBottom();
+
+  function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+  function addBubble(text, role) {
+    const wrap = document.createElement('div');
+    wrap.className = role === 'user' ? 'd-flex justify-content-end mb-3' : 'd-flex justify-content-start mb-3';
+    const bubble = document.createElement('div');
+    bubble.className = role === 'user' ? 'chat-bubble chat-user' : 'chat-bubble chat-assistant';
+    // allow **bold** from dummy provider
+    let html = escapeHtml(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+    bubble.innerHTML = html;
+    wrap.appendChild(bubble);
+    // remove empty placeholder if present
+    const empty = historyEl.querySelector('.text-center.py-5');
+    if (empty) empty.remove();
+    historyEl.appendChild(wrap);
+    scrollToBottom();
+  }
+  function getCsrf() {
+    const v = document.cookie.match(/csrftoken=([^;]+)/);
+    return v ? v[1] : (document.querySelector('[name=csrfmiddlewaretoken]')?.value || '');
+  }
+
+  document.querySelectorAll('.quick-prompt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      input.value = btn.dataset.prompt;
+      input.focus();
+    });
+  });
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      errorEl.classList.add('d-none');
+      addBubble(text, 'user');
+      input.value = '';
+      input.disabled = true;
+      try {
+        const res = await fetch("{% url 'assistant:send' %}", {
+          method: "POST",
+          headers: {"Content-Type": "application/json", "X-CSRFToken": getCsrf()},
+          body: JSON.stringify({message: text})
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        addBubble(data.reply, 'assistant');
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.remove('d-none');
+      } finally {
+        input.disabled = false;
+        input.focus();
+      }
+    });
+  }
+
+  if (clearForm) {
+    clearForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!confirm('Clear all chat history?')) return;
+      await fetch(clearForm.action, {method: 'POST', headers: {"X-CSRFToken": getCsrf()}});
+      historyEl.innerHTML = '<div class=\"text-center py-5\"><p class=\"small text-muted\">Chat cleared. Ask a new question.</p></div>';
+    });
+  }
+})();
+</script>
+{% endblock %}

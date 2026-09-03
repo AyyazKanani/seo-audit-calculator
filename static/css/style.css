@@ -843,6 +843,30 @@ html:not(.js) [data-aos] {
 .progress-bar.bg-warning { background-color: var(--warning) !important; }
 .progress-bar.bg-danger { background-color: var(--danger) !important; }
 
+/* Chat bubbles */
+.chat-bubble {
+    max-width: 78%;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    word-break: break-word;
+}
+.chat-user {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    border-bottom-right-radius: 6px;
+}
+.chat-assistant {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-bottom-left-radius: 6px;
+}
+@media (max-width: 576px) {
+    .chat-bubble { max-width: 88%; }
+}
+
 /* Accessibility — visible focus */
 .btn:focus-visible,
 a:focus-visible,
