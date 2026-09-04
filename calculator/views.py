@@ -2,12 +2,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST
+from django.utils import timezone
+from django.views.decorators.http import require_GET, require_POST
 
 from .forms import SEOReportForm
 from .models import SEOReport
+from .pdf import generate_report_pdf
 from .services import create_report
 
 
@@ -86,3 +88,15 @@ def report_delete_view(request, pk: int):
     report.delete()
     messages.success(request, "Report deleted.")
     return redirect("calculator:reports")
+
+
+@login_required
+@require_GET
+def report_pdf_view(request, pk: int):
+    # Single query enforces ownership — no separate check needed (IDOR-safe)
+    report = get_object_or_404(SEOReport, pk=pk, user=request.user)
+    pdf_bytes = generate_report_pdf(report)
+    response = HttpResponse(pdf_bytes, content_type="application/pdf")
+    date_str = timezone.localtime(report.created_at).strftime("%Y-%m-%d")
+    response["Content-Disposition"] = f'attachment; filename="seo-report-{date_str}.pdf"'
+    return response
