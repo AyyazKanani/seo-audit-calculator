@@ -14,7 +14,7 @@
             </div>
 
             <div class="calc-card" data-aos="fade-up" data-aos-delay="100">
-                <form method="post" novalidate>
+                <form method="post" novalidate id="calc-form">
                     {% csrf_token %}
 
                     <div class="row g-3">
@@ -55,8 +55,10 @@
                     </div>
 
                     <div class="d-grid d-md-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
-                            <i class="bi bi-graph-up me-2"></i>Calculate SEO Score
+                        <button type="submit" id="calc-submit" class="btn btn-primary btn-lg flex-grow-1">
+                            <span class="calc-btn-text"><i class="bi bi-graph-up me-2"></i>Calculate SEO Score</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            <span class="d-none calc-loading-text"> Calculating...</span>
                         </button>
                         <button type="reset" class="btn btn-outline-dark">Clear</button>
                     </div>
@@ -109,6 +111,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     [title, meta, content].forEach(el => el && el.addEventListener('input', upd));
     upd();
+
+    const form = document.getElementById('calc-form');
+    const btn = document.getElementById('calc-submit');
+    if (form && btn) {
+        form.addEventListener('submit', function() {
+            if (!form.checkValidity()) return;
+            btn.disabled = true;
+            btn.querySelector('.calc-btn-text').classList.add('d-none');
+            btn.querySelector('.spinner-border').classList.remove('d-none');
+            btn.querySelector('.calc-loading-text').classList.remove('d-none');
+        });
+    }
 });
 </script>
 {% endblock %}

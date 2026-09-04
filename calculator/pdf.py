@@ -54,14 +54,9 @@ GRADE_BORDER = {
 
 
 def _grade_for(score: int) -> str:
-    # Mirrors calculator/models.py Grade thresholds and constants.GRADE_RANGES
-    if score >= 80:
-        return "A"
-    if score >= 60:
-        return "B"
-    if score >= 40:
-        return "C"
-    return "D"
+    from calculator.constants import grade_for_score
+
+    return grade_for_score(score)
 
 
 def generate_report_pdf(report) -> bytes:

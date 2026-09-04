@@ -1,8 +1,34 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 
-from .constants import GRADE_RANGES
+from .constants import GRADE_RANGES, grade_for_score
+
+
+class SEOReportQuerySet(models.QuerySet):
+    """Reusable filters — keeps views thin and consistent."""
+
+    def for_user(self, user):
+        return self.filter(user=user)
+
+    def search(self, query: str):
+        query = (query or "").strip()
+        if not query:
+            return self
+        return self.filter(Q(title__icontains=query) | Q(target_keyword__icontains=query))
+
+    def with_grade(self, grade: str):
+        grade = (grade or "").strip().upper()
+        # Accept labels like "Excellent" as well
+        from .constants import GRADE_LABEL_TO_CODE
+
+        if grade in GRADE_LABEL_TO_CODE:
+            grade = GRADE_LABEL_TO_CODE[grade]
+        if grade not in GRADE_RANGES:
+            return self
+        low, high = GRADE_RANGES[grade]
+        return self.filter(overall_score__gte=low, overall_score__lte=high)
 
 
 class SEOReport(models.Model):
@@ -59,6 +85,8 @@ class SEOReport(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    objects = SEOReportQuerySet.as_manager()
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "SEO Report"
@@ -76,14 +104,8 @@ class SEOReport(models.Model):
 
     @property
     def grade(self) -> str:
-        """Letter grade derived from overall_score (uses GRADE_RANGES)."""
-        if self.overall_score >= GRADE_RANGES["A"][0]:
-            return self.Grade.A
-        if self.overall_score >= GRADE_RANGES["B"][0]:
-            return self.Grade.B
-        if self.overall_score >= GRADE_RANGES["C"][0]:
-            return self.Grade.C
-        return self.Grade.D
+        """Letter grade derived from overall_score."""
+        return grade_for_score(self.overall_score)
 
     @property
     def grade_label(self) -> str:

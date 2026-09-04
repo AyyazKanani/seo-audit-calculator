@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -47,24 +46,19 @@ def report_list_view(request):
     """
     Private history for logged-in user.
     Supports ?q= search (title or keyword) and ?grade= filter (A/B/C/D).
-    Paginated 9 per page. Uses single source GRADE_RANGES.
+    Paginated 9 per page. Uses QuerySet helpers for DRY filtering.
     """
+    q = (request.GET.get("q") or "").strip()[:100]
+    grade = (request.GET.get("grade") or "").strip().upper()
+
+    qs = SEOReport.objects.for_user(request.user).search(q).with_grade(grade)
+    # Normalize grade after QuerySet handling (invalid grades become "" via with_grade no-op)
     from calculator.constants import GRADE_LABEL_TO_CODE, GRADE_RANGES
 
-    qs = SEOReport.objects.filter(user=request.user)
-
-    q = (request.GET.get("q") or "").strip()[:100]
-    if q:
-        qs = qs.filter(Q(title__icontains=q) | Q(target_keyword__icontains=q))
-
-    grade = (request.GET.get("grade") or "").strip().upper()
     if grade in GRADE_LABEL_TO_CODE:
         grade = GRADE_LABEL_TO_CODE[grade]
-    if grade in GRADE_RANGES:
-        low, high = GRADE_RANGES[grade]
-        qs = qs.filter(overall_score__gte=low, overall_score__lte=high)
-    else:
-        grade = ""  # normalize invalid value
+    if grade not in GRADE_RANGES:
+        grade = ""
 
     paginator = Paginator(qs, 9)
     page_number = request.GET.get("page")

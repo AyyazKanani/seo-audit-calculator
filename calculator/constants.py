@@ -63,3 +63,15 @@ GRADE_LABEL_TO_CODE = {
     "NEEDS_IMPROVEMENT": "C",
     "POOR": "D",
 }
+
+
+def grade_for_score(score: int | float | None) -> str:
+    """Return grade letter for any score. Centralizes threshold logic."""
+    s = int(score or 0)
+    if s >= 80:
+        return "A"
+    if s >= 60:
+        return "B"
+    if s >= 40:
+        return "C"
+    return "D"
