@@ -1,10 +1,12 @@
-AOS.init({
-    duration: 600,
-    easing: "ease-out-cubic",
-    once: true,
-    offset: 60,
-    disableMutationObserver: true,
-});
+if (typeof AOS !== 'undefined') {
+    AOS.init({
+        duration: 600,
+        easing: "ease-out-cubic",
+        once: true,
+        offset: 60,
+        disableMutationObserver: true,
+    });
+}
 
 document.querySelectorAll(".toggle-password").forEach(function(btn) {
     btn.addEventListener("click", function() {
@@ -24,3 +26,38 @@ document.querySelectorAll(".toggle-password").forEach(function(btn) {
         }
     });
 });
+
+// New-gen toast — robust auto-dismiss (works even if AOS fails)
+function initToasts() {
+    document.querySelectorAll(".toast-modern").forEach(function(toast) {
+        if (toast.dataset.toastInit) return;
+        toast.dataset.toastInit = "1";
+        var closeBtn = toast.querySelector(".toast-close");
+        var timeout;
+        function dismiss() {
+            toast.style.animation = "toastSlideOut 0.3s ease forwards";
+            setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
+        }
+        if (closeBtn) closeBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            clearTimeout(timeout);
+            dismiss();
+        });
+        timeout = setTimeout(dismiss, 4000);
+        toast.addEventListener("mouseenter", function() {
+            clearTimeout(timeout);
+            var bar = toast.querySelector(".toast-progress-bar");
+            if (bar) bar.style.animationPlayState = "paused";
+        });
+        toast.addEventListener("mouseleave", function() {
+            timeout = setTimeout(dismiss, 1200);
+            var bar = toast.querySelector(".toast-progress-bar");
+            if (bar) bar.style.animationPlayState = "running";
+        });
+    });
+}
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initToasts);
+} else {
+    initToasts();
+}

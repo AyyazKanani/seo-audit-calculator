@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+  </defs>
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="8" fill="#0f172a"/>
+  <rect width="32" height="32" rx="8" fill="url(#g)"/>
+  <!-- Magnifying glass -->
+  <circle cx="14" cy="14" r="6.5" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M18.2 18.2 L23 23" stroke="white" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- Small bars inside lens = SEO audit chart -->
+  <g transform="translate(9.2 11.5)">
+    <rect x="0" y="4" width="2" height="3" rx="0.6" fill="white" opacity="0.95"/>
+    <rect x="3" y="2" width="2" height="5" rx="0.6" fill="white" opacity="0.95"/>
+    <rect x="6" y="0" width="2" height="7" rx="0.6" fill="white" opacity="0.95"/>
+  </g>
+</svg>

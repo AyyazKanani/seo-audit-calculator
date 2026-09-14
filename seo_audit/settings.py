@@ -21,12 +21,19 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "core",
     "accounts",
     "calculator",
     "dashboard",
     "assistant",
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -37,6 +44,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 ROOT_URLCONF = "seo_audit.urls"
@@ -85,6 +93,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
@@ -104,9 +117,32 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 # AI Assistant provider — dummy (predefined) now, swap to gemini/openai later via .env
 AI_PROVIDER = env("AI_PROVIDER", default="dummy")
 
-# Login redirect after successful authentication
+# Auth — keep custom email+password + add Google via allauth
 LOGIN_URL = "accounts:login"
-LOGIN_REDIRECT_URL = "core:home"
+LOGIN_REDIRECT_URL = "dashboard:dashboard"
+ACCOUNT_LOGOUT_REDIRECT_URL = "core:home"
+
+# django-allauth — email/username login stays, Google auto-creates
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        # Reads from .env — never commit real values (see .env.example)
+        # Supports both GOOGLE_CLIENT_ID and CLIENT_ID for backward compat
+        "APP": {
+            "client_id": env("GOOGLE_CLIENT_ID", default=env("CLIENT_ID", default="")),
+            "secret": env("GOOGLE_CLIENT_SECRET", default=env("CLIENT_SECRET", default="")),
+            "key": "",
+        },
+    }
+}
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
