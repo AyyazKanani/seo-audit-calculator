@@ -27,7 +27,7 @@ def register_view(request):
     else:
         form = UserRegisterForm()
 
-    return render(request, "accounts/register.html", {"form": form})
+    return render(request, "accounts/register.html", {"form": form, "next": request.GET.get("next", "")})
 
 
 @require_http_methods(["GET", "POST"])
@@ -44,7 +44,7 @@ def login_view(request):
                 request,
                 f"Too many failed attempts. Try again in {LOCKOUT_SECONDS // 60} minutes.",
             )
-            return render(request, "accounts/login.html", {"form": UserLoginForm()})
+            return render(request, "accounts/login.html", {"form": UserLoginForm(), "next": request.GET.get("next", "")})
 
         form = UserLoginForm(request.POST)
         if form.is_valid():
@@ -78,7 +78,7 @@ def login_view(request):
     else:
         form = UserLoginForm()
 
-    return render(request, "accounts/login.html", {"form": form})
+    return render(request, "accounts/login.html", {"form": form, "next": request.GET.get("next", "")})
 
 
 @login_required

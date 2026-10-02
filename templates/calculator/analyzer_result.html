@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}URL Analysis {{ report_data.overall_score }}/100 | SEO Audit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+
+            <!-- Top bar -->
+            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4" data-aos="fade-up">
+                <a href="{% url 'calculator:analyzer' %}" class="btn btn-outline-dark btn-sm">
+                    <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Analyze Another URL
+                </a>
+                {% if report %}
+                <span class="badge bg-dark border text-muted fw-medium">
+                    <i class="bi bi-hash me-1" aria-hidden="true"></i>Report #{{ report.pk }} • {{ report.created_at|date:"M d, Y H:i" }}
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Overall score card -->
+            {% with rd=report_data %}
+            <div class="card overall-card border-0 shadow-sm mb-4 overflow-hidden" data-aos="fade-up" data-aos-delay="50">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row align-items-center g-4">
+                        <!-- Circular progress -->
+                        <div class="col-12 col-md-5 text-center">
+                            {% with grade=rd.overall_score %}
+                            <div class="circular-progress grade-{% if grade >= 80 %}a{% elif grade >= 60 %}b{% elif grade >= 40 %}c{% else %}d{% endif %} mx-auto" style="--score: {{ rd.overall_score }};" role="img" aria-label="Overall SEO score {{ rd.overall_score }} out of 100">
+                                <svg width="160" height="160" viewBox="0 0 120 120" class="circular-svg" aria-hidden="true">
+                                    <title>Overall score {{ rd.overall_score }}/100</title>
+                                    <circle cx="60" cy="60" r="52" class="track"></circle>
+                                    <circle cx="60" cy="60" r="52" class="progress"></circle>
+                                </svg>
+                                <div class="circular-center" aria-hidden="true">
+                                    <span class="circular-number">{{ rd.overall_score }}</span>
+                                    <span class="circular-total">/100</span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="badge rounded-pill grade-badge grade-{% if grade >= 80 %}a{% elif grade >= 60 %}b{% elif grade >= 40 %}c{% else %}d{% endif %} px-3 py-2">
+                                    Grade {% if grade >= 80 %}A — Excellent{% elif grade >= 60 %}B — Good{% elif grade >= 40 %}C — Needs Work{% else %}D — Poor{% endif %}
+                                </span>
+                            </div>
+                            {% endwith %}
+                        </div>
+
+                        <!-- Details -->
+                        <div class="col-12 col-md-7">
+                            <span class="text-uppercase small fw-semibold" style="letter-spacing:.08em; color: var(--primary-light);">URL Analysis</span>
+                            <h3 class="fw-bold mt-1 mb-3" style="color: var(--text);">Page is <span class="text-gradient">
+                                {% if rd.overall_score >= 80 %}Excellent{% elif rd.overall_score >= 60 %}Good{% elif rd.overall_score >= 40 %}Needs Work{% else %}Poor{% endif %}
+                            </span></h3>
+
+                            <div class="row g-3 mb-3">
+                                {% if rd.target_keyword %}
+                                <div class="col-6">
+                                    <div class="mini-stat">
+                                        <span class="mini-label"><i class="bi bi-bullseye me-1" aria-hidden="true"></i>Keyword</span>
+                                        <span class="mini-value">{{ rd.target_keyword }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                <div class="col-6">
+                                    <div class="mini-stat">
+                                        <span class="mini-label"><i class="bi bi-file-text me-1" aria-hidden="true"></i>Words</span>
+                                        <span class="mini-value">{{ rd.word_count }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mini-stat">
+                                        <span class="mini-label"><i class="bi bi-link-45deg me-1" aria-hidden="true"></i>URL</span>
+                                        <span class="mini-value text-break">{{ rd.url }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-dark border text-muted fw-normal"><i class="bi bi-type me-1" aria-hidden="true"></i>Title: {{ rd.title_score }}/100</span>
+                                <span class="badge bg-dark border text-muted fw-normal"><i class="bi bi-card-text me-1" aria-hidden="true"></i>Meta: {{ rd.meta_score }}/100</span>
+                                <span class="badge bg-dark border text-muted fw-normal"><i class="bi bi-bullseye me-1" aria-hidden="true"></i>{{ rd.keyword_density }}% density</span>
+                                <span class="badge {% if rd.is_https %}bg-success{% else %}bg-danger{% endif %} border fw-normal">
+                                    <i class="bi bi-shield-lock me-1" aria-hidden="true"></i>{% if rd.is_https %}HTTPS{% else %}No HTTPS{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+
+            <!-- Metric cards row 1 — Standard SEO -->
+            <div class="row g-3 g-md-4 mb-4">
+                <!-- Title -->
+                <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="70">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-indigo" aria-hidden="true"><i class="bi bi-type"></i></div>
+                                <span class="badge metric-badge grade-{% if report_data.title_score >= 80 %}a{% elif report_data.title_score >= 60 %}b{% elif report_data.title_score >= 40 %}c{% else %}d{% endif %}">{{ report_data.title_score }}<small>/100</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Title Tag</h6>
+                            <p class="small text-muted mb-3">Ideal 50–60 chars</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar {% if report_data.title_score >= 80 %}bg-success{% elif report_data.title_score >= 60 %}bg-lime{% elif report_data.title_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ report_data.title_score }}%;" aria-valuenow="{{ report_data.title_score }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="small text-muted mt-2 mb-0 text-truncate" title="{{ report_data.title }}"><i class="bi bi-quote me-1" aria-hidden="true"></i>{{ report_data.title|truncatechars:62|default:"No title found" }}</p>
+                            <p class="small text-muted mb-0"><i class="bi bi-rulers me-1" aria-hidden="true"></i>{{ report_data.title|length }} chars</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meta -->
+                <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="90">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-cyan" aria-hidden="true"><i class="bi bi-card-text"></i></div>
+                                <span class="badge metric-badge grade-{% if report_data.meta_score >= 80 %}a{% elif report_data.meta_score >= 60 %}b{% elif report_data.meta_score >= 40 %}c{% else %}d{% endif %}">{{ report_data.meta_score }}<small>/100</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Meta Description</h6>
+                            <p class="small text-muted mb-3">Ideal 120–160 chars</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar {% if report_data.meta_score >= 80 %}bg-success{% elif report_data.meta_score >= 60 %}bg-lime{% elif report_data.meta_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ report_data.meta_score }}%;" aria-valuenow="{{ report_data.meta_score }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="small text-muted mt-2 mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ report_data.meta_description|truncatechars:82|default:"No meta description found" }}</p>
+                            <p class="small text-muted mb-0"><i class="bi bi-rulers me-1" aria-hidden="true"></i>{{ report_data.meta_description|length }} chars</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- URL -->
+                <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="110">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-slate" aria-hidden="true"><i class="bi bi-link-45deg"></i></div>
+                                <span class="badge metric-badge grade-{% if report_data.url_score >= 80 %}a{% elif report_data.url_score >= 60 %}b{% elif report_data.url_score >= 40 %}c{% else %}d{% endif %}">{{ report_data.url_score }}<small>/100</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">URL Structure</h6>
+                            <p class="small text-muted mb-3">Short, hyphens, keyword</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar {% if report_data.url_score >= 80 %}bg-success{% elif report_data.url_score >= 60 %}bg-lime{% elif report_data.url_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ report_data.url_score }}%;" aria-valuenow="{{ report_data.url_score }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="small text-muted mt-2 mb-0 text-break">{{ report_data.url|truncatechars:50 }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="col-12 col-md-6 col-lg-6" data-aos="fade-up" data-aos-delay="130">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-green" aria-hidden="true"><i class="bi bi-file-text"></i></div>
+                                <span class="badge metric-badge grade-{% if report_data.content_score >= 80 %}a{% elif report_data.content_score >= 60 %}b{% elif report_data.content_score >= 40 %}c{% else %}d{% endif %}">{{ report_data.content_score }}<small>/100</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Content Quality</h6>
+                            <p class="small text-muted mb-3">{{ report_data.word_count }} words • ideal 600–1500</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar {% if report_data.content_score >= 80 %}bg-success{% elif report_data.content_score >= 60 %}bg-lime{% elif report_data.content_score >= 40 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ report_data.content_score }}%;" aria-valuenow="{{ report_data.content_score }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="d-flex gap-2 mt-3">
+                                <span class="badge bg-dark border text-muted fw-normal small">{{ report_data.word_count }} words</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keyword Density -->
+                <div class="col-12 col-md-6 col-lg-6" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-amber" aria-hidden="true"><i class="bi bi-bullseye"></i></div>
+                                <span class="badge metric-badge grade-{% if report_data.keyword_density >= 1 and report_data.keyword_density <= 2.5 %}a{% elif report_data.keyword_density >= 0.5 and report_data.keyword_density <= 3.5 %}c{% else %}d{% endif %}">{{ report_data.keyword_density }}<small>%</small></span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Keyword Density</h6>
+                            <p class="small text-muted mb-3">Ideal 1–2.5%{% if report_data.target_keyword %} for "{{ report_data.target_keyword }}"{% endif %}</p>
+                            <div class="progress" style="height: 6px; background: var(--bg);">
+                                <div class="progress-bar density-bar" role="progressbar" data-density="{{ report_data.keyword_density }}" style="width: 50%;"></div>
+                            </div>
+                            <p class="small mt-2 mb-0">
+                                {% if report_data.keyword_density >= 1 and report_data.keyword_density <= 2.5 %}
+                                    <span class="text-success"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>Ideal range</span>
+                                {% elif report_data.keyword_density >= 0.5 and report_data.keyword_density <= 3.5 %}
+                                    <span class="text-warning"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Near ideal</span>
+                                {% elif report_data.keyword_density > 0 %}
+                                    <span class="text-danger"><i class="bi bi-x-circle me-1" aria-hidden="true"></i>Needs adjustment</span>
+                                {% else %}
+                                    <span class="text-muted"><i class="bi bi-dash-circle me-1" aria-hidden="true"></i>Keyword not found</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extra analyzer metrics -->
+            <div class="row g-3 g-md-4 mb-4">
+                <!-- H1 / H2 Headings -->
+                <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="170">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-pink" aria-hidden="true"><i class="bi bi-type-h1"></i></div>
+                                <span class="badge metric-badge {% if report_data.h1_count == 1 %}grade-a{% elif report_data.h1_count > 1 %}grade-c{% else %}grade-d{% endif %}">
+                                    {{ report_data.h1_count }} H1
+                                </span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Headings</h6>
+                            <p class="small text-muted mb-2">{{ report_data.h2_count }} H2 tags found</p>
+                            {% if report_data.h1_texts %}
+                            <ul class="list-unstyled small mb-0">
+                                {% for h in report_data.h1_texts %}
+                                <li class="text-muted mb-1" title="{{ h }}"><i class="bi bi-hash me-1" aria-hidden="true"></i>{{ h|truncatechars:60 }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p class="small text-danger mb-0"><i class="bi bi-x-circle me-1" aria-hidden="true"></i>No H1 tag found</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="190">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-orange" aria-hidden="true"><i class="bi bi-image"></i></div>
+                                <span class="badge metric-badge {% if report_data.images_missing_alt == 0 %}grade-a{% elif report_data.images_missing_alt <= 2 %}grade-c{% else %}grade-d{% endif %}">
+                                    {{ report_data.image_count }} images
+                                </span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Images &amp; Alt Text</h6>
+                            <p class="small text-muted mb-2">{{ report_data.images_missing_alt }} missing alt text</p>
+                            {% if report_data.images_missing_alt == 0 %}
+                            <p class="small text-success mb-0"><i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i>All images have alt text</p>
+                            {% else %}
+                            <p class="small text-danger mb-0"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Add alt text for accessibility &amp; image SEO</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Links -->
+                <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="210">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-teal" aria-hidden="true"><i class="bi bi-diagram-3"></i></div>
+                                <span class="badge metric-badge grade-b">
+                                    {{ report_data.internal_links }}+{{ report_data.external_links }}
+                                </span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Link Profile</h6>
+                            <div class="d-flex gap-3 mt-2">
+                                <div>
+                                    <span class="d-block fw-bold" style="color: var(--text);">{{ report_data.internal_links }}</span>
+                                    <span class="small text-muted">Internal</span>
+                                </div>
+                                <div>
+                                    <span class="d-block fw-bold" style="color: var(--text);">{{ report_data.external_links }}</span>
+                                    <span class="small text-muted">External</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security & Technical -->
+                <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="230">
+                    <div class="card metric-card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="metric-icon bg-{% if report_data.is_https %}green{% else %}red{% endif %}" aria-hidden="true">
+                                    <i class="bi bi-{% if report_data.is_https %}shield-fill-check{% else %}shield-x{% endif %}"></i>
+                                </div>
+                                <span class="badge metric-badge {% if report_data.is_https %}grade-a{% else %}grade-d{% endif %}">
+                                    {% if report_data.is_https %}HTTPS{% else %}No HTTPS{% endif %}
+                                </span>
+                            </div>
+                            <h6 class="card-title fw-bold mb-1" style="color: var(--text);">Security &amp; Technical</h6>
+                            <ul class="list-unstyled small mb-0">
+                                <li class="mb-1 {% if report_data.is_https %}text-success{% else %}text-danger{% endif %}">
+                                    <i class="bi bi-{% if report_data.is_https %}check-circle{% else %}x-circle{% endif %} me-1" aria-hidden="true"></i>
+                                    SSL/TLS Certificate ({% if report_data.is_https %}Valid{% else %}Missing{% endif %})
+                                </li>
+                                {% if report_data.canonical_url %}
+                                <li class="mb-1 text-success">
+                                    <i class="bi bi-check-circle me-1" aria-hidden="true"></i>Canonical URL set
+                                </li>
+                                {% else %}
+                                <li class="mb-1 text-warning">
+                                    <i class="bi bi-exclamation-circle me-1" aria-hidden="true"></i>No canonical URL
+                                </li>
+                                {% endif %}
+                                {% if report_data.robots_meta %}
+                                <li class="mb-1 text-muted">
+                                    <i class="bi bi-robot me-1" aria-hidden="true"></i>Robots: {{ report_data.robots_meta }}
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keyword presence (if keyword provided) -->
+                {% if report_data.target_keyword %}
+                <div class="col-12" data-aos="fade-up" data-aos-delay="250">
+                    <div class="card metric-card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="metric-icon bg-indigo flex-shrink-0" aria-hidden="true"><i class="bi bi-bullseye"></i></div>
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title fw-bold mb-2" style="color: var(--text);">Keyword Presence: "{{ report_data.target_keyword }}"</h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge {% if report_data.keyword_in_title %}bg-success{% else %}bg-danger{% endif %} border-0">
+                                            <i class="bi bi-{% if report_data.keyword_in_title %}check{% else %}x{% endif %}-circle me-1"></i>Title
+                                        </span>
+                                        <span class="badge {% if report_data.keyword_in_meta %}bg-success{% else %}bg-danger{% endif %} border-0">
+                                            <i class="bi bi-{% if report_data.keyword_in_meta %}check{% else %}x{% endif %}-circle me-1"></i>Meta
+                                        </span>
+                                        <span class="badge {% if report_data.keyword_in_h1 %}bg-success{% else %}bg-danger{% endif %} border-0">
+                                            <i class="bi bi-{% if report_data.keyword_in_h1 %}check{% else %}x{% endif %}-circle me-1"></i>H1
+                                        </span>
+                                        <span class="badge {% if report_data.keyword_found %}bg-success{% else %}bg-danger{% endif %} border-0">
+                                            <i class="bi bi-{% if report_data.keyword_found %}check{% else %}x{% endif %}-circle me-1"></i>Body
+                                        </span>
+                                        <span class="badge {% if report_data.keyword_in_url %}bg-success{% else %}bg-danger{% endif %} border-0">
+                                            <i class="bi bi-{% if report_data.keyword_in_url %}check{% else %}x{% endif %}-circle me-1"></i>URL
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Recommendations -->
+            <div class="card reco-card border-0 shadow-sm mb-4" data-aos="fade-up" data-aos-delay="270">
+                <div class="card-header bg-transparent border-bottom d-flex align-items-center gap-2 py-3" style="border-color: var(--border) !important;">
+                    <div class="reco-header-icon" aria-hidden="true"><i class="bi bi-lightbulb-fill"></i></div>
+                    <h5 class="mb-0 fw-bold" style="color: var(--text);">Action Plan</h5>
+                    <span class="badge bg-dark border text-muted ms-auto">{{ report_data.recommendations|length }} steps</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for tip in report_data.recommendations %}
+                    <li class="list-group-item reco-item d-flex gap-3 align-items-start">
+                        <span class="reco-number" aria-hidden="true">{{ forloop.counter }}</span>
+                        <span class="flex-grow-1">{{ tip }}</span>
+                        <i class="bi bi-chevron-right text-muted small mt-1 d-none d-md-block" aria-hidden="true"></i>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- CTA -->
+            <div class="text-center d-flex flex-wrap gap-2 justify-content-center" data-aos="fade-up" data-aos-delay="290">
+                {% if user.is_authenticated and report %}
+                <a href="{% url 'calculator:report_pdf' report.pk %}" class="btn btn-success btn-lg px-4">
+                    <i class="bi bi-download me-2" aria-hidden="true"></i>Download PDF
+                </a>
+                {% endif %}
+                <a href="{% url 'calculator:analyzer' %}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-arrow-repeat me-2" aria-hidden="true"></i>Analyze Another URL
+                </a>
+                <a href="{% url 'calculator:calculator' %}" class="btn btn-outline-dark">
+                    <i class="bi bi-calculator me-1" aria-hidden="true"></i> Manual Calculator
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.density-bar').forEach(function(bar){
+        var d = parseFloat(bar.dataset.density || 0);
+        var w = Math.min((d / 5) * 100, 100);
+        bar.style.width = w + '%';
+        if (d >= 1 && d <= 2.5) bar.style.background = 'var(--success)';
+        else if (d >= 0.5 && d <= 3.5) bar.style.background = 'var(--warning)';
+        else bar.style.background = 'var(--danger)';
+    });
+});
+</script>
+{% endblock %}
